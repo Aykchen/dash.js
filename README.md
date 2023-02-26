@@ -33,7 +33,7 @@ The [nightly build of the /dev branch reference player](http://reference.dashif.
 The latest minified files have been hosted on a global CDN and are free to use in production:
 
 - [dash.all.min.js](http://cdn.dashjs.org/latest/dash.all.min.js)
-- [dash.all.debug.js](http://cdn.dashjs.org/latest/dash.all.debug.js)
+- [dash.all.debug.js](https://cdnjs.cloudflare.com/ajax/libs/dashjs/3.1.2/dash.mss.debug.js)
 
 In addition, all the releases are available under the following urls. Replace "vx.x.x" with the release version, for instance "v3.1.0".
 

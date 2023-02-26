@@ -928,6 +928,7 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
         });
     };
 
+    let setIntervalID = 0;
     $scope.doLoad = function () {
         $scope.initSession();
 
@@ -1060,10 +1061,35 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
                     lang: $scope.initialSettings.text
                 });
             }
-        }
+        }            
         $scope.player.updateSettings({ streaming: { text: { defaultEnabled: $scope.initialSettings.textEnabled } } });
         $scope.player.enableForcedTextStreaming($scope.initialSettings.forceTextStreaming);
         $scope.controlbar.enable();
+
+        let startTime = 0;
+        let completeTime = 0;
+        setInterval(() => {
+            var streamInfo = $scope.player.getActiveStream().getStreamInfo();
+            var dashMetrics = $scope.player.getDashMetrics();
+            var dashAdapter = $scope.player.getDashAdapter();
+            
+            if (dashMetrics && streamInfo) {
+                const periodIdx = streamInfo.index;
+                var repSwitch = dashMetrics.getCurrentRepresentationSwitch('video', true);
+                var bufferLevel = dashMetrics.getCurrentBufferLevel('video', true);
+                var bitrate = repSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, periodIdx) / 1000) : NaN;
+                // var segmentDownloadTime = dashMetrics.getCurrentHttpRequest("video").tresponse-dashMetrics.getCurrentHttpRequest("video").trequest
+                // var segmentSize = dashMetrics.getCurrentHttpRequest("video").trace[0].b[0]
+                console.log('Selected Bitrate: ' + (bitrate/1000) + ' Mbps')
+                console.log('Buffer Level: ' + bufferLevel + ' secs')
+                console.log('Measured Throughput: ' + ($scope.player.getAverageThroughput('video')/1000000) + ' Mbps');
+                // console.log("Segment download time: " + segmentDownloadTime + " seconds");
+                // console.log("Segment size: " + segmentSize + " bytes")
+            }}, 8000)
+
+        $scope.player.on(dashjs.MediaPlayer.events['FRAGMENT_LOADING_STARTED'],(e)=> {if(e.mediaType=='video'){startTime = Date.now()}})
+        $scope.player.on(dashjs.MediaPlayer.events['FRAGMENT_LOADING_COMPLETED'],(e)=> {if(e.mediaType=='video'){completeTime = Date.now(); console.log('Segment download time: ' + (completeTime-startTime)/1000);
+            console.log('Segment size: ' + e['request']['bytesTotal'] + ' bytes')}})
     };
 
     $scope.doStop = function () {
@@ -1830,8 +1856,8 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
         else if (value === 'null') typedValue = null;
         else if (value === 'undefined') typedValue = undefined;
         else integerRegEx.test(value) ? typedValue = parseInt(value) :
-                (floatRegEx.test(value) ? typedValue = parseFloat(value) :
-                    typedValue = value);
+            (floatRegEx.test(value) ? typedValue = parseFloat(value) :
+                typedValue = value);
 
         return typedValue;
     }

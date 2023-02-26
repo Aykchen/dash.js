@@ -52,8 +52,8 @@ let urlsToCache = [
     '../../contrib/akamai/controlbar/ControlBar.js',
     '../../contrib/akamai/controlbar/icomoon.ttf',
     'http://dashif.org/wp-content/uploads/2014/12/dashif.ico',
-    '../../dist/dash.all.debug.js',
-    '../../dist/dash.mss.debug.js'
+    'http://cdn.dashjs.org/latest/dash.all.debug.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/dashjs/3.1.2/dash.mss.debug.js'
 ]
 
 self.addEventListener('install',
